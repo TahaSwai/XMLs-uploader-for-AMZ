@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP="TahaDento_AM_XML_Batcher_v2_FINAL.zip"
+          ZIP="TahaDento_AM_XML_Batcher_v4_30SEC_Channel.zip"
 
           if [[ ! -f "$ZIP" ]]; then
             echo "::error::Missing $ZIP in repository root."
@@ -49,7 +49,7 @@ jobs:
           rm -rf extracted
           mkdir -p extracted
 
-          unzip -q TahaDento_AM_XML_Batcher_v2_FINAL.zip -d extracted
+          unzip -q TahaDento_AM_XML_Batcher_v4_30SEC_Channel.zip -d extracted
 
           PROJECT_DIR="$(
             find extracted \
