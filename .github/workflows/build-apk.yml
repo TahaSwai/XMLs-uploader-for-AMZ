@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP="TahaDento_AM_XML_Batcher_v8_USER_TIMEOUT.zip"
+          ZIP="TahaDento_AM_XML_Batcher_v8_USER_TIMEOUT_FIXED.zip"
 
           if [[ ! -f "$ZIP" ]]; then
             echo "::error::Missing $ZIP in repository root."
@@ -50,7 +50,7 @@ jobs:
           rm -rf extracted
           mkdir -p extracted
 
-          unzip -q TahaDento_AM_XML_Batcher_v8_USER_TIMEOUT.zip -d extracted
+          unzip -q TahaDento_AM_XML_Batcher_v8_USER_TIMEOUT_FIXED.zip -d extracted
 
           SETTINGS_FILE="$(
             find extracted \
@@ -62,7 +62,9 @@ jobs:
 
           if [[ -z "$SETTINGS_FILE" ]]; then
             echo "::error::settings.gradle was not found."
+
             find extracted -maxdepth 5 -type f | sort | head -200
+
             exit 1
           fi
 
@@ -70,7 +72,9 @@ jobs:
 
           if [[ ! -f "$PROJECT_DIR/app/build.gradle" ]]; then
             echo "::error::app/build.gradle was not found."
+
             find "$PROJECT_DIR" -maxdepth 3 -type f | sort
+
             exit 1
           fi
 
@@ -109,11 +113,19 @@ jobs:
         run: |
           set -euo pipefail
 
+          echo "Java:"
           java -version
+
+          echo "ADB:"
           adb version
+
+          echo "SDK Manager:"
           sdkmanager --version
 
+          echo "Android 35:"
           ls -la "$ANDROID_SDK_ROOT/platforms/android-35"
+
+          echo "Build Tools 35.0.0:"
           ls -la "$ANDROID_SDK_ROOT/build-tools/35.0.0"
 
       - name: Set up Gradle
@@ -122,7 +134,7 @@ jobs:
           gradle-version: '8.11.1'
           cache-read-only: false
 
-      - name: Build TahaDento V8
+      - name: Build TahaDento V8 Fixed
         shell: bash
         run: |
           set -euo pipefail
@@ -132,7 +144,7 @@ jobs:
           echo "Gradle version:"
           gradle --version
 
-          echo "Building TahaDento V8..."
+          echo "Building TahaDento V8 Fixed..."
 
           gradle \
             --no-daemon \
@@ -164,7 +176,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-V8-USER-TIMEOUT
+          name: TahaDento-V8-USER-TIMEOUT-FIXED
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
@@ -173,7 +185,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-V8-build-diagnostics
+          name: TahaDento-V8-FIXED-build-diagnostics
           path: |
             ${{ env.PROJECT_DIR }}/app/build/reports/**
             ${{ env.PROJECT_DIR }}/app/build/outputs/logs/**
