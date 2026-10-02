@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP="TahaDento_AM_XML_Batcher_v6_ACTIVITY_RESULT.zip"
+          ZIP="TahaDento_AM_XML_Batcher_v8_USER_TIMEOUT.zip"
 
           if [[ ! -f "$ZIP" ]]; then
             echo "::error::Missing $ZIP in repository root."
@@ -50,9 +50,9 @@ jobs:
           rm -rf extracted
           mkdir -p extracted
 
-          unzip -q TahaDento_AM_XML_Batcher_v6_ACTIVITY_RESULT.zip -d extracted
+          unzip -q TahaDento_AM_XML_Batcher_v8_USER_TIMEOUT.zip -d extracted
 
-          PROJECT_DIR="$(
+          SETTINGS_FILE="$(
             find extracted \
               -type f \
               -name settings.gradle \
@@ -60,17 +60,16 @@ jobs:
               -print -quit
           )"
 
-          if [[ -z "$PROJECT_DIR" ]]; then
-            echo "::error::settings.gradle was not found inside the ZIP."
+          if [[ -z "$SETTINGS_FILE" ]]; then
+            echo "::error::settings.gradle was not found."
             find extracted -maxdepth 5 -type f | sort | head -200
             exit 1
           fi
 
-          PROJECT_DIR="$(dirname "$PROJECT_DIR")"
+          PROJECT_DIR="$(dirname "$SETTINGS_FILE")"
 
           if [[ ! -f "$PROJECT_DIR/app/build.gradle" ]]; then
-            echo "::error::Android app module was not found."
-            echo "Expected: $PROJECT_DIR/app/build.gradle"
+            echo "::error::app/build.gradle was not found."
             find "$PROJECT_DIR" -maxdepth 3 -type f | sort
             exit 1
           fi
@@ -100,19 +99,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          SDKMANAGER="$(command -v sdkmanager)"
-
-          echo "sdkmanager: $SDKMANAGER"
-          sdkmanager --version
-
-          "$SDKMANAGER" \
+          sdkmanager \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
-
-          echo "Installed SDK packages:"
-          "$SDKMANAGER" --list_installed | grep -E \
-            'platform-tools|platforms;android-35|build-tools;35.0.0' || true
 
       - name: Verify Android environment
         shell: bash
@@ -120,10 +110,6 @@ jobs:
           set -euo pipefail
 
           java -version
-
-          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-}"
-          echo "ANDROID_HOME=${ANDROID_HOME:-}"
-
           adb version
           sdkmanager --version
 
@@ -136,7 +122,7 @@ jobs:
           gradle-version: '8.11.1'
           cache-read-only: false
 
-      - name: Build TahaDento APK
+      - name: Build TahaDento V8
         shell: bash
         run: |
           set -euo pipefail
@@ -146,7 +132,7 @@ jobs:
           echo "Gradle version:"
           gradle --version
 
-          echo "Building TahaDento V6..."
+          echo "Building TahaDento V8..."
 
           gradle \
             --no-daemon \
@@ -178,7 +164,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-AM-XML-Batcher-V6-Activity-Result
+          name: TahaDento-V8-USER-TIMEOUT
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
@@ -187,7 +173,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-V6-build-diagnostics
+          name: TahaDento-V8-build-diagnostics
           path: |
             ${{ env.PROJECT_DIR }}/app/build/reports/**
             ${{ env.PROJECT_DIR }}/app/build/outputs/logs/**
