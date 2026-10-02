@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP="TahaDento_AM_XML_Batcher_v4_30SEC_Channel.zip"
+          ZIP="TahaDento_AM_XML_Batcher_v5_SMART_SUCCESS.zip"
 
           if [[ ! -f "$ZIP" ]]; then
             echo "::error::Missing $ZIP in repository root."
@@ -49,7 +49,7 @@ jobs:
           rm -rf extracted
           mkdir -p extracted
 
-          unzip -q TahaDento_AM_XML_Batcher_v4_30SEC_Channel.zip -d extracted
+          unzip -q TahaDento_AM_XML_Batcher_v5_SMART_SUCCESS.zip -d extracted
 
           PROJECT_DIR="$(
             find extracted \
@@ -173,7 +173,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-AM-XML-Batcher
+          name: TahaDento-AM-XML-Batcher-V5-Smart-Success
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
