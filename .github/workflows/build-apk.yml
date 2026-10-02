@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP="TahaDento_AM_XML_Batcher_GitHub.zip"
+          ZIP="TahaDento_AM_XML_Batcher_v2_FINAL.zip"
 
           if [[ ! -f "$ZIP" ]]; then
             echo "::error::Missing $ZIP in repository root."
@@ -49,7 +49,7 @@ jobs:
           rm -rf extracted
           mkdir -p extracted
 
-          unzip -q TahaDento_AM_XML_Batcher_GitHub.zip -d extracted
+          unzip -q TahaDento_AM_XML_Batcher_v2_FINAL.zip -d extracted
 
           PROJECT_DIR="$(
             find extracted \
@@ -92,7 +92,7 @@ jobs:
           accept-android-sdk-licenses: 'true'
           log-accepted-android-sdk-licenses: 'false'
 
-      - name: Install exact Android build packages
+      - name: Install Android SDK packages
         shell: bash
         run: |
           set -euo pipefail
@@ -111,7 +111,7 @@ jobs:
           "$SDKMANAGER" --list_installed | grep -E \
             'platform-tools|platforms;android-35|build-tools;35.0.0' || true
 
-      - name: Verify Java and Android environment
+      - name: Verify Android environment
         shell: bash
         run: |
           set -euo pipefail
@@ -143,8 +143,7 @@ jobs:
           echo "Gradle version:"
           gradle --version
 
-          echo "Building:"
-          echo "  :app:assembleDebug"
+          echo "Building TahaDento..."
 
           gradle \
             --no-daemon \
@@ -179,7 +178,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload build reports on failure
+      - name: Upload diagnostics if build fails
         if: failure()
         uses: actions/upload-artifact@v4
         with:
