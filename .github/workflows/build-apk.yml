@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP="TahaDento_AM_XML_Batcher_v5_SMART_SUCCESS.zip"
+          ZIP="TahaDento_AM_XML_Batcher_v6_ACTIVITY_RESULT.zip"
 
           if [[ ! -f "$ZIP" ]]; then
             echo "::error::Missing $ZIP in repository root."
@@ -39,6 +39,7 @@ jobs:
           ls -lh "$ZIP"
 
           unzip -tq "$ZIP"
+
           echo "ZIP integrity check passed."
 
       - name: Extract Android project
@@ -49,7 +50,7 @@ jobs:
           rm -rf extracted
           mkdir -p extracted
 
-          unzip -q TahaDento_AM_XML_Batcher_v5_SMART_SUCCESS.zip -d extracted
+          unzip -q TahaDento_AM_XML_Batcher_v6_ACTIVITY_RESULT.zip -d extracted
 
           PROJECT_DIR="$(
             find extracted \
@@ -75,7 +76,9 @@ jobs:
           fi
 
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Android project: $PROJECT_DIR"
+
+          echo "Android project:"
+          echo "$PROJECT_DIR"
 
       - name: Set up Java 17
         uses: actions/setup-java@v6
@@ -143,7 +146,7 @@ jobs:
           echo "Gradle version:"
           gradle --version
 
-          echo "Building TahaDento..."
+          echo "Building TahaDento V6..."
 
           gradle \
             --no-daemon \
@@ -160,9 +163,11 @@ jobs:
 
           if [[ ! -f "$APK" ]]; then
             echo "::error::APK was not produced."
+
             find "$PROJECT_DIR/app/build/outputs" \
               -type f \
               -maxdepth 6 2>/dev/null || true
+
             exit 1
           fi
 
@@ -173,7 +178,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-AM-XML-Batcher-V5-Smart-Success
+          name: TahaDento-AM-XML-Batcher-V6-Activity-Result
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
@@ -182,7 +187,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: TahaDento-build-diagnostics
+          name: TahaDento-V6-build-diagnostics
           path: |
             ${{ env.PROJECT_DIR }}/app/build/reports/**
             ${{ env.PROJECT_DIR }}/app/build/outputs/logs/**
